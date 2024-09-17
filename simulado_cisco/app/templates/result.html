@@ -1,0 +1,48 @@
+<!-- app/templates/result.html -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Seu Resultado</h2>
+    <p>Você acertou {{ score }} de {{ total }} perguntas.</p>
+    
+    {% if feedback %}
+        <h3>Onde Você Pode Melhorar:</h3>
+        <ul>
+            {% for item in feedback %}
+                <li>
+                    <strong>Pergunta:</strong> {{ item.question }}<br>
+                    <strong>Sua Resposta:</strong> {{ item.your_answer }}<br>
+                    <strong>Resposta Correta:</strong> {{ item.correct_answer }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    
+    <h3>Histórico de Scores</h3>
+    <canvas id="scoreChart" width="400" height="200"></canvas>
+    
+    <script>
+        const scores = {{ scores_data | tojson }};
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        const scoreChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: scores.map((_, index) => `Tentativa ${index + 1}`),
+                datasets: [{
+                    label: 'Pontuação',
+                    data: scores,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, max: {{ total }} }
+                }
+            }
+        });
+    </script>
+    
+    <a href="/" class="btn">Voltar ao Início</a>
+{% endblock %}
